@@ -1,0 +1,131 @@
+###Type_rides###
+
+WITH type_of_ride AS
+( 
+  SELECT ride_type, member_type, count(*) AS amount_of_rides
+  FROM `studious-matrix-350304.bike_share.cleaned_combined_tripdata`
+  GROUP BY ride_type, member_type
+  ORDER BY member_type, amount_of_rides DESC
+)
+SELECT * 
+FROM type_of_ride;
+
+###Monthly Rides###
+
+WITH rides_per_month AS 
+( 
+  SELECT member_type,month, COUNT(*) AS num_of_rides
+  FROM `studious-matrix-350304.bike_share.cleaned_combined_tripdata`
+  GROUP BY member_type, month
+  )
+SELECT * 
+FROM rides_per_month; 
+
+### Weekday Num Rides###
+WITH rides_per_day AS 
+( 
+  SELECT member_type, day_of_week, COUNT (*) AS num_of_rides
+  FROM `studious-matrix-350304.bike_share.cleaned_combined_tripdata`
+  GROUP BY member_type, day_of_week
+)
+SELECT * 
+FROM rides_per_day;
+
+### Ride per hour###
+ WITH rides_per_hour AS 
+ (
+   SELECT member_type, EXTRACT(HOUR FROM started_at) AS time_of_day, COUNT(*) AS num_of_rides
+   FROM `studious-matrix-350304.bike_share.cleaned_combined_tripdata`
+   GROUP BY member_type, time_of_day
+ )
+ SELECT * 
+ FROM rides_per_hour;
+
+ ###Average length ride per day###
+ WITH avg_trip_length AS 
+ ( 
+  SELECT member_type,
+    day_of_week,
+    ROUND(AVG(ride_time_minutes), 0) AS avg_ride_time_mintues, 
+    AVG(AVG(ride_time_minutes)) OVER(PARTITION BY member_type) AS combined_avg_ride_time
+  FROM `studious-matrix-350304.bike_share.cleaned_combined_tripdata`
+  GROUP BY member_type, day_of_week 
+ )
+ SELECT * 
+ FROM avg_trip_length;
+
+### Starting Docking Station (Casuals)###
+
+WITH start_station_casuals AS 
+(
+  SELECT starting_station_name, 
+    ROUND(AVG(start_lat), 4) AS start_lat,
+    ROUND(AVG(start_lng), 4) AS start_lng,
+    COUNT(*) AS num_of_rides
+  FROM `studious-matrix-350304.bike_share.cleaned_combined_tripdata`
+  WHERE member_type = 'casual' AND starting_station_name <> 'On Bike Lock'
+  GROUP BY starting_station_name
+)
+SELECT * 
+FROM start_station_casuals;
+
+### Starting Docking Station (Members)###
+
+WITH start_station_members AS 
+(
+  SELECT starting_station_name, 
+    ROUND(AVG(start_lat), 4) AS start_lat,
+    ROUND(AVG(start_lng), 4) AS start_lng,
+    COUNT(*) AS num_of_rides
+  FROM `studious-matrix-350304.bike_share.cleaned_combined_tripdata`
+  WHERE member_type = 'member' AND starting_station_name <> 'On Bike Lock'
+  GROUP BY starting_station_name
+)
+SELECT * 
+FROM start_station_members;
+
+###Ending Docking Station (Casual)
+WITH end_station_casual AS 
+(
+  SELECT ending_station_name, 
+    ROUND(AVG(start_lat), 4) AS end_lat,
+    ROUND(AVG(start_lng), 4) AS end_lng,
+    COUNT(*) AS num_of_rides
+  FROM `studious-matrix-350304.bike_share.cleaned_combined_tripdata`
+  WHERE member_type = 'casual' AND ending_station_name <> 'On Bike Lock'
+  GROUP BY ending_station_name
+)
+SELECT * 
+FROM end_station_casual;
+
+### Ending Bike Station (Members) ###
+WITH end_station_member AS 
+(
+  SELECT ending_station_name, 
+    ROUND(AVG(start_lat), 4) AS end_lat,
+    ROUND(AVG(start_lng), 4) AS end_lng,
+    COUNT(*) AS num_of_rides
+  FROM `studious-matrix-350304.bike_share.cleaned_combined_tripdata`
+  WHERE member_type = 'member' AND ending_station_name <> 'On Bike Lock'
+  GROUP BY ending_station_name
+)
+SELECT * 
+FROM end_station_member;
+
+### Bike Lock Ending (Casuals) ###
+
+WITH lock_location_casual AS 
+(
+  SELECT end_lat, end_lng, COUNT(*) AS num_of_rides
+  FROM `studious-matrix-350304.bike_share.cleaned_combined_tripdata`
+  WHERE ending_station_name = 'On Bike Lock' AND member_type = 'casual'
+  GROUP BY end_lat, end_lng
+)
+SELECT* 
+FROM lock_location_casual;
+
+### Bike Lock ending (Member) ###
+ SELECT end_lat, end_lng, COUNT(*) AS num_of_rides
+  FROM `studious-matrix-350304.bike_share.cleaned_combined_tripdata`
+  WHERE ending_station_name = 'On Bike Lock' AND member_type = 'member'
+  GROUP BY end_lat, end_lng
