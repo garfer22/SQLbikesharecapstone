@@ -2,7 +2,7 @@
 
 # Introduction: 
 This Capstone project is to showcase my analytical skill after completed the google data analyst ceterficate. I use sql programming in order to showcase my cleaning on the raw data and pulling information into tables. I then used my completed data in order to create a Tableau to showcase my data visulazation. 
-# Backgroound: 
+# Background: 
 The organization cylistic is looking to increase their annual membership in order to see an increase in sales. Our goal is to see how both casual riders and annual riders differ from each other throughout the year 2021. 
 # Other info:
 * To view the raw dataset used for this capstone project, please click here: [[Cyclistic Raw Data. ](https://divvy-tripdata.s3.amazonaws.com/index.html)]
